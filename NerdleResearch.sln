@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34511.84
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NerdleResearch", "NerdleResearch\NerdleResearch.csproj", "{991C8DFA-0F39-4B63-A482-347938A01FC5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1342DA11-9189-4339-AF56-89559601716B} = {1342DA11-9189-4339-AF56-89559601716B}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Validation", "Validation\Validation.csproj", "{1342DA11-9189-4339-AF56-89559601716B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{991C8DFA-0F39-4B63-A482-347938A01FC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{991C8DFA-0F39-4B63-A482-347938A01FC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{991C8DFA-0F39-4B63-A482-347938A01FC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{991C8DFA-0F39-4B63-A482-347938A01FC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1342DA11-9189-4339-AF56-89559601716B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1342DA11-9189-4339-AF56-89559601716B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1342DA11-9189-4339-AF56-89559601716B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1342DA11-9189-4339-AF56-89559601716B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {777BF034-DD0E-4A05-B4A0-67B82777D243}
+	EndGlobalSection
+EndGlobal
