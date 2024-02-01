@@ -1,11 +1,5 @@
 ﻿module Generation
 
-let oneDigitNumbers = [ 1..9 ] |> List.map string
-let twoDigitNumbers = [ 10..99 ] |> List.map string
-let threeDigitNumbers = [ 100..999 ] |> List.map string
-let zeroThruNine = [ 0..9 ] |> List.map string
-let operations = [ '+'; '-'; '*'; '/' ] |> List.map string
-
 let patterns =
     [ "1#2=3" // 6
       "2#1=3"
