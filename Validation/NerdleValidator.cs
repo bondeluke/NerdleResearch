@@ -18,7 +18,7 @@ namespace Validation
             return left == right;
         }
 
-        public static int Evaluate(string expression)
+        public static float Evaluate(string expression)
         {
             var result = EvaluateRecursively(ExpressionParser.Parse(expression));
 
@@ -46,7 +46,7 @@ namespace Validation
             return EvaluateRecursively(start.Append(new Number(result)).Concat(end).ToList());
         }
 
-        private static int Evaluate(Number left, Operation middle, Number right)
+        private static float Evaluate(Number left, Operation middle, Number right)
         {
             return middle.value switch
             {

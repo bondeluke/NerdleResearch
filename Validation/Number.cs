@@ -1,8 +1,8 @@
 namespace Validation
 {
-    public class Number(int value) : Symbol()
+    public class Number(float value) : Symbol()
     {
-        public int value = value;
+        public float value = value;
 
         public override string ToString()
         {

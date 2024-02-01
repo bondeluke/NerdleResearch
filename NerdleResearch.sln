@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NerdleResearch", "NerdleRes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Validation", "Validation\Validation.csproj", "{1342DA11-9189-4339-AF56-89559601716B}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Generation", "Generation\Generation.fsproj", "{B1A45E9C-AF6A-4F05-9AF6-9FACECA9675C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +26,10 @@ Global
 		{1342DA11-9189-4339-AF56-89559601716B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1342DA11-9189-4339-AF56-89559601716B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1342DA11-9189-4339-AF56-89559601716B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1A45E9C-AF6A-4F05-9AF6-9FACECA9675C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1A45E9C-AF6A-4F05-9AF6-9FACECA9675C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1A45E9C-AF6A-4F05-9AF6-9FACECA9675C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1A45E9C-AF6A-4F05-9AF6-9FACECA9675C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
