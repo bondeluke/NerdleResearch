@@ -16,4 +16,22 @@
             _ => throw new ArgumentException(),
         };
     }
+
+    public static List<string> Enumerate(String pattern) {
+        var candidates = Stuff.Convert(pattern[0]);
+        for (int i = 1; i < pattern.Length; i++)
+        {
+            if (i < pattern.Length - 1)
+            {
+                candidates = Stuff.CrossMultiply(candidates, Stuff.Convert('#'));
+            }
+            else
+            {
+                candidates = candidates.Select(x => $"{x}=").ToList();
+            }
+
+            candidates = Stuff.CrossMultiply(candidates, Stuff.Convert(pattern[i]));
+        }
+        return candidates;
+    }
 }
