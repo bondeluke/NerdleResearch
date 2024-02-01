@@ -1,37 +1,31 @@
-﻿public static class Stuff
+﻿namespace NerdleResearch;
+
+public static class Stuff
 {
-    public static List<String> CrossMultiply(List<String> one, List<String> two)
+    public static IEnumerable<string> CrossMultiply(IEnumerable<string> one, IEnumerable<string> two)
     {
-        return one.SelectMany(o => two.Select(t => o + t)).ToList();
+        return one.SelectMany(o => two.Select(t => o + t));
     }
 
-    public static List<String> Convert(char value)
+    public static IEnumerable<string> Translate(char value)
     {
         return value switch
         {
-            '1' => Generation.oneDigitNumbers.Select(it => it.ToString()).ToList(),
-            '2' => Generation.twoDigitNumbers.Select(it => it.ToString()).ToList(),
-            '3' => Generation.threeDigitNumbers.Select(it => it.ToString()).ToList(),
-            '#' => Generation.operations.Select(it => it.ToString()).ToList(),
+            '1' => Generation.oneDigitNumbers.Select(it => it.ToString()),
+            '2' => Generation.twoDigitNumbers.Select(it => it.ToString()),
+            '3' => Generation.threeDigitNumbers.Select(it => it.ToString()),
+            '#' => Generation.operations.Select(it => it.ToString()),
+            '=' => ["="],
+            'Z' => Generation.zeroThruNine.Select(it => it.ToString()),
             _ => throw new ArgumentException(),
         };
     }
 
-    public static List<string> Enumerate(String pattern) {
-        var candidates = Stuff.Convert(pattern[0]);
-        for (int i = 1; i < pattern.Length; i++)
-        {
-            if (i < pattern.Length - 1)
-            {
-                candidates = Stuff.CrossMultiply(candidates, Stuff.Convert('#'));
-            }
-            else
-            {
-                candidates = candidates.Select(x => $"{x}=").ToList();
-            }
-
-            candidates = Stuff.CrossMultiply(candidates, Stuff.Convert(pattern[i]));
-        }
-        return candidates;
+    public static IEnumerable<string> Enumerate(string pattern)
+    {
+        return pattern
+            .Aggregate(
+                new List<string> { "" },
+                (value, character) => CrossMultiply(value, Translate(character)).ToList());
     }
 }

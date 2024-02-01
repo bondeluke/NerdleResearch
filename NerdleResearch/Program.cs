@@ -1,11 +1,10 @@
 ﻿
+using NerdleResearch;
 using Validation;
 
 var answers = Generation.patterns
-    .SelectMany(Stuff.Enumerate)
-    .Where(o => !o.Contains("/0"))
+    .SelectMany(Generation.enumerate)
     .Where(NerdleValidator.IsValidEquation)
     .ToList();
 
 Console.WriteLine(answers.Count);
-
