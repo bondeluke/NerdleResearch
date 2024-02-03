@@ -11,9 +11,6 @@ let patterns =
       "1#2#1=Z"
       "2#1#1=Z" ]
 
-let crossMultiply (left: string list) (right: string list) =
-    List.collect (fun o -> List.map (fun t -> o + t) right) left
-
 let translate (value: char) =
     match value with
     | 'Z' -> [ 0..9 ] |> List.map string
@@ -24,5 +21,8 @@ let translate (value: char) =
     | '=' -> [ "=" ]
     | _ -> failwith "Invalid argument"
 
+let multiply (left: string list) (right: string list) =
+    List.collect (fun l -> List.map (fun r ->  l + r) right) left
+
 let enumerate (pattern: string) =
-    Seq.fold (fun acc value -> crossMultiply acc (translate value)) [""] pattern
+    Seq.fold (fun acc value -> multiply acc (translate value)) [""] pattern
