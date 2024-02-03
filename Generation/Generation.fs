@@ -1,17 +1,18 @@
 ﻿module Generation
 
-let patterns =
-    [ "1#2=3" // 6
-      "2#1=3"
-      "2#2=2"
-      "3#1=2"
-      "3#2=Z"
-      "1#1#1=2" // 5
-      "1#1#2=Z"
-      "1#2#1=Z"
-      "2#1#1=Z" ]
+let private patterns =
+    [ "123"; "213"; "222"; "312"; "321"; "1112"; "1121"; "1211"; "2111" ]
 
-let translate (value: char) =
+let private enhance (pattern: string) : string =
+    pattern
+    |> Seq.mapi (fun index digit ->
+        if index < (pattern.Length - 2) then $"{digit}#"
+        elif index = (pattern.Length - 2) then $"{digit}="
+        elif digit = '1' then "Z" // The last digit can be zero
+        else $"{digit}")
+    |> String.concat ""
+
+let private translate (value: char) : string list =
     match value with
     | 'Z' -> [ 0..9 ] |> List.map string
     | '1' -> [ 1..9 ] |> List.map string
@@ -19,12 +20,13 @@ let translate (value: char) =
     | '3' -> [ 100..999 ] |> List.map string
     | '#' -> [ "+"; "-"; "*"; "/" ]
     | '=' -> [ "=" ]
-    | _ -> failwith "Invalid argument"
+    | _ -> failwith $"Invalid argument '{value}'"
 
-let multiply (left: string list) (right: string list) =
-    List.collect (fun l -> List.map (fun r ->  l + r) right) left
 
-let enumerate (pattern: string) =
-    pattern |> Seq.fold (fun acc value -> translate value |> multiply acc) [""]
+let private multiply (left: string list) (right: string list) : string list =
+    List.collect (fun l -> List.map (fun r -> l + r) right) left
 
-let possibleSolutions = patterns |> List.collect (fun p -> enumerate(p))
+let private enumerate (pattern: string) =
+    Seq.fold (fun acc value -> translate value |> multiply acc) [ "" ] pattern
+
+let possibleSolutions = (List.map enhance >> List.collect enumerate) patterns
