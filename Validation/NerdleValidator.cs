@@ -18,59 +18,51 @@ namespace Validation
             return float.IsInteger(left) && (int)left == right;
         }
 
-        public static float Evaluate(string expression)
+        private static float Evaluate(string expression)
         {
-            var result = Evaluate(ExpressionParser.Parse(expression));
+            var symbols = ExpressionParser.Parse(expression);
 
-            return ((Number)result.Single()).value;
-        }
-
-        private static IEnumerable<Symbol> Evaluate(IList<Symbol> expression)
-        {
             while (true)
             {
-                if (expression.Count == 1)
+                if (symbols.Count == 1)
                 {
-                    return expression;
+                    return ((Number)symbols.Single()).Value;
                 }
 
-                var index = FindIndexToEvaluate(expression);
+                var index = FindIndexToEvaluate(symbols);
 
-                var result = Evaluate((Number)expression[index - 1], (Operation)expression[index], (Number)expression[index + 1]);
+                var result = Evaluate((Number)symbols[index - 1], (Operation)symbols[index], (Number)symbols[index + 1]);
 
-                expression = expression
+                symbols = symbols
                     .Take(index - 1)
                     .Append(new Number(result))
-                    .Concat(expression.Skip(index + 2))
+                    .Concat(symbols.Skip(index + 2))
                     .ToList();
             }
         }
 
         private static float Evaluate(Number left, Operation middle, Number right)
         {
-            return middle.value switch
+            return middle.Value switch
             {
-                '+' => left.value + right.value,
-                '-' => left.value - right.value,
-                '*' => left.value * right.value,
-                '/' => left.value / right.value,
-                _ => throw new ArgumentException($"Invalid operation '{middle.value}'"),
+                '+' => left.Value + right.Value,
+                '-' => left.Value - right.Value,
+                '*' => left.Value * right.Value,
+                '/' => left.Value / right.Value,
+                _ => throw new ArgumentException($"Invalid operation '{middle.Value}'"),
             };
         }
 
-        private static int FindIndexToEvaluate(IList<Symbol> expression)
+        private static int FindIndexToEvaluate(IList<Symbol> symbols)
         {
             char[] priorityOperations = ['*', '/'];
 
-            for (var index = 1; index < expression.Count; index += 2)
+            for (var index = 1; index < symbols.Count; index += 2)
             {
-                var operation = ((Operation)expression[index]).value;
-
-                if (priorityOperations.Any(p => p == operation))
+                if (priorityOperations.Any(p => p == ((Operation)symbols[index]).Value))
                 {
                     return index;
                 }
-
             }
 
             return 1;

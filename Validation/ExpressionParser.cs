@@ -1,13 +1,13 @@
 namespace Validation
 {
-    class ExpressionParser
+    internal class ExpressionParser
     {
         public static List<Symbol> Parse(string expression)
         {
             var symbols = new List<Symbol>();
             var number = string.Empty;
 
-            foreach (char c in expression)
+            foreach (var c in expression)
             {
                 var operation = IsOperation(c);
 

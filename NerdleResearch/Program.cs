@@ -1,8 +1,7 @@
 ﻿
 using Validation;
 
-var answers = Generation.patterns
-    .SelectMany(Generation.enumerate)
+var answers = Generation.possibleSolutions
     .Where(NerdleValidator.IsValidEquation)
     .ToList();
 

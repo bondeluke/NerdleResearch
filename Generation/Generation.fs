@@ -25,4 +25,6 @@ let multiply (left: string list) (right: string list) =
     List.collect (fun l -> List.map (fun r ->  l + r) right) left
 
 let enumerate (pattern: string) =
-    Seq.fold (fun acc value -> multiply acc (translate value)) [""] pattern
+    pattern |> Seq.fold (fun acc value -> translate value |> multiply acc) [""]
+
+let possibleSolutions = patterns |> List.collect (fun p -> enumerate(p))
