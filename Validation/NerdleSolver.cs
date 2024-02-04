@@ -5,7 +5,26 @@
         Unknown,
         Exactly,
         AtLeast,
-        Dead,
+        Dead
+    }
+
+    public enum GuessResult
+    {
+        Correct,
+        Somewhere,
+        Dead
+    }
+
+    internal class GuessInfo(char character, int index, GuessResult result)
+    {
+        public char Character { get; } = character;
+        public int Index { get; } = index;
+        public GuessResult Result { get; } = result;
+
+        public override string ToString()
+        {
+            return $"{Character} at {Index} | {Result}";
+        }
     }
 
     public class CharacterInformation(char character, int count = -1, OccurenceType type = OccurenceType.Unknown)
@@ -27,9 +46,9 @@
         }
     }
 
-    public class NerdleSolver(IList<string> possibleAnswers)
+    public class NerdleSolver(IList<string> answers)
     {
-        private List<string> possibilities =
+        private readonly List<string> possibilities =
         [
             "0123456789",
             "0123456789+-*/",
@@ -41,69 +60,65 @@
             "0123456789"
         ];
 
-        private readonly List<CharacterInformation> characterInformation = "0123456789+-*/"
+        private readonly List<CharacterInformation> information = "0123456789+-*/"
             .Select(c => new CharacterInformation(c))
-            .Append(new CharacterInformation('=', 0, OccurenceType.Exactly))
+            .Append(new CharacterInformation('=', 1, OccurenceType.Exactly))
             .ToList();
 
-        public void DigestGuess(string guess, string result)
+        public void DigestGuess(string equation, string result)
         {
-            var alive = new List<char>();
-            var dead = new List<char>();
+            var guessInfo = result
+                .Select((_, i) => new GuessInfo(equation[i], i, Convert(result[i])))
+                .GroupBy(c => c.Character)
+                .ToDictionary(g => g.Key, g => g.ToList());
 
-            for (var i = 0; i < result.Length; i++)
+            foreach (var guess in guessInfo)
             {
-                var guessedCharacter = guess[i];
+                var character = guess.Key.ToString();
+                var info = information.First(c => c.Character == guess.Key);
+                var dead = guess.Value.Where(g => g.Result == GuessResult.Dead).ToList();
+                var correct = guess.Value.Where(g => g.Result == GuessResult.Correct).ToList();
+                var somewhere = guess.Value.Where(g => g.Result == GuessResult.Somewhere).ToList();
 
-                switch (result[i])
+                info.Count = Math.Max(correct.Count + somewhere.Count, info.Count);
+                info.Type = info.Type == OccurenceType.Exactly
+                    ? OccurenceType.Exactly
+                    : info.Count != 0
+                        ? dead.Count != 0
+                            ? OccurenceType.Exactly
+                            : OccurenceType.AtLeast
+                        : OccurenceType.Dead;
+
+                foreach (var g in correct)
                 {
-                    case 'B':
-                        // Black - this character is nowhere in the space of possibilities
-                        possibilities = possibilities.Select(p => p.Replace(guessedCharacter.ToString(), "")).ToList();
-                        dead.Add(guessedCharacter);
-                        break;
-                    case 'G':
-                        // Green - update possibilities[i] to be the one possibility
-                        possibilities[i] = $"{guessedCharacter}";
-                        alive.Add(guessedCharacter);
-                        break;
-                    case 'P':
-                        // Purple - remove character at index
-                        possibilities[i] = possibilities[i].Replace(guessedCharacter.ToString(), "");
-                        alive.Add(guessedCharacter);
-                        break;
-                    default:
-                        throw new ArgumentException($"Unrecognized character '{result[i]}'");
+                    possibilities[g.Index] = character;
+                }
+                foreach (var g in somewhere.Concat(dead))
+                {
+                    possibilities[g.Index] = possibilities[g.Index].Replace(character, "");
+                }
+                if (somewhere.Count == 0 && dead.Count != 0)
+                {
+                    var extraIndexesToCrossOut = Enumerable
+                        .Range(0, possibilities.Count)
+                        .Where(i => correct.All(c => c.Index != i));
+
+                    foreach (var index in extraIndexesToCrossOut)
+                    {
+                        possibilities[index] = possibilities[index].Replace(character, "");
+                    }
                 }
             }
 
-            var aliveCounts = alive.GroupBy(c => c).ToDictionary(g => g.Key, g => g.Count());
+            UpdateAnswers();
 
-            foreach (var aliveChar in aliveCounts)
-            {
-                var info = characterInformation.Single(ci => ci.Character == aliveChar.Key);
-                info.Count = Math.Max(info.Count, aliveChar.Value);
-                info.Type = dead.Any(c => c == info.Character) || info.Type == OccurenceType.Exactly
-                    ? OccurenceType.Exactly
-                    : OccurenceType.AtLeast;
-            }
-
-            foreach (var deadChar in dead)
-            {
-                var info = characterInformation.Single(ci => ci.Character == deadChar);
-                info.Count = 0;
-                info.Type = OccurenceType.Dead;
-            }
-
-            possibleAnswers = UpdatePossibleAnswer(possibleAnswers);
-
-            Console.WriteLine($"My next guess is {possibleAnswers.First()}");
+            Console.WriteLine($"My next guess is {answers.First()}");
         }
 
-        private IList<string> UpdatePossibleAnswer(IList<string> answers)
+        private void UpdateAnswers()
         {
-            return answers
-                .Where(answer => characterInformation
+            answers = answers
+                .Where(answer => information
                     .Where(c => c.Type is OccurenceType.AtLeast or OccurenceType.Exactly)
                     .Select(c => c.Character)
                     .All(answer.Contains))
@@ -111,6 +126,17 @@
                     .Select((_, index) => index)
                     .All(index => possibilities[index].Contains(answer[index]))
                 ).ToList();
+        }
+
+        private static GuessResult Convert(char result)
+        {
+            return result switch
+            {
+                'G' => GuessResult.Correct,
+                'P' => GuessResult.Somewhere,
+                'B' => GuessResult.Dead,
+                _ => throw new ArgumentOutOfRangeException(nameof(result), result, null)
+            };
         }
     }
 }
