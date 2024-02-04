@@ -1,4 +1,5 @@
 ﻿
+using Solver;
 using Validation;
 
 var answers = Generation.possibleSolutions
@@ -14,9 +15,4 @@ var solver = new NerdleSolver(answers);
 //    solver.DigestGuess(guess[..8], guess[8..16]);
 //}
 
-solver.DigestGuess("8-3+7=12", "PBPPGGBB");
-solver.DigestGuess("33+47=80", "GBGGGGGB");
-solver.DigestGuess("39+47=86", "GGGGGGGG");
-
-
-
+solver.DigestGuess("8*5-4=36", "BBBPPGBB");

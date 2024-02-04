@@ -1,7 +1,6 @@
-namespace Validation
+namespace Validation;
+
+public abstract class Symbol
 {
-    public abstract class Symbol
-    {
-        public abstract override string ToString();
-    }
+    public abstract override string ToString();
 }

@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Generation\Generation.fsproj" />
+    <ProjectReference Include="..\Solver\Solver.csproj" />
     <ProjectReference Include="..\Validation\Validation.csproj" />
   </ItemGroup>
 
