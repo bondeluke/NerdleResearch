@@ -7,18 +7,23 @@ var answers = Generation.possibleSolutions
     .Where(NerdleValidator.IsValidEquation)
     .ToList();
 
-var solver = new NerdleSolver(answers);
-
-solver.SuggestFirstGuess();
-
 while (true)
 {
-    Console.WriteLine("What's the result?!");
-    var result = Console.ReadLine();
-    var solved = solver.DigestGuess(result);
-    if (solved)
-        break;
-}
+    var solver = new NerdleSolver(answers);
+    solver.SuggestFirstGuess();
 
-Console.WriteLine("Press any key to exit...");
-Console.ReadLine();
+    while (true)
+    {
+        Console.WriteLine("What's the result?!");
+        var result = Console.ReadLine();
+        var solved = solver.DigestGuess(result);
+        if (solved)
+            break;
+    }
+
+    Console.WriteLine("Press 'c' to play again...");
+    var key = Console.ReadKey();
+    if (key.KeyChar != 'c')
+        break;
+    Console.WriteLine();
+}
