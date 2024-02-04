@@ -19,10 +19,29 @@ public class NerdleSolver(IList<string> answers)
         .Append(new CharacterInfo('=', 1, OccurenceType.Exactly))
         .ToList();
 
-    public void DigestGuess(string equation, string result)
+    private readonly Random random = new (DateTime.Now.Millisecond);
+    private string? theGuess;
+
+    public void SuggestFirstGuess()
     {
+        var goodGuesses = answers
+            .Where(a => a.IndexOf('=') == 5 && a.Distinct().Count() == 8)
+            .ToList();
+
+        theGuess = goodGuesses[random.Next(goodGuesses.Count)];
+
+        Console.WriteLine($"Your first guess should be: {theGuess}");
+    }
+
+    public bool DigestGuess(string result)
+    {
+        if (theGuess is null)
+        {
+            throw new Exception("Execute method 'SuggestFirstGuess()' first!");
+        }
+
         var guessInfo = result
-            .Select((_, i) => new GuessInfo(equation[i], i, Convert(result[i])))
+            .Select((_, i) => new GuessInfo(theGuess[i], i, Convert(result[i])))
             .GroupBy(c => c.Character);
 
         foreach (var guess in guessInfo)
@@ -66,7 +85,32 @@ public class NerdleSolver(IList<string> answers)
 
         UpdateAnswers();
 
-        Console.WriteLine($"My next guess is {answers.First()}");
+        if (answers.Count == 1)
+        {
+            var fgc = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.DarkMagenta;
+            Console.WriteLine($"The answer is {answers.First()} !!!");
+            Console.ForegroundColor = fgc;
+            return true;
+        }
+
+        var unknownCharacters = information
+            .Where(c => c.Type == OccurenceType.Unknown)
+            .Select(c => c.Character);
+
+        var bestGuesses = answers
+            .GroupBy(a => a.Distinct().Intersect(unknownCharacters).Count())
+            .OrderByDescending(g => g.Key)
+            .First()
+            .ToList();
+
+        Console.WriteLine($"There are {answers.Count} possible answers, but only {bestGuesses.Count} best guesses!");
+
+        theGuess = bestGuesses[random.Next(bestGuesses.Count)];
+
+        Console.WriteLine($"Your next guess should be: {theGuess}");
+
+        return false;
     }
 
     private void UpdateAnswers()
