@@ -22,7 +22,6 @@ let private translate (value: char) : string list =
     | '=' -> [ "=" ]
     | _ -> failwith $"Invalid argument '{value}'"
 
-
 let private multiply (left: string list) (right: string list) : string list =
     List.collect (fun l -> List.map (fun r -> l + r) right) left
 
