@@ -1,8 +1,9 @@
 ﻿
+using NerdleResearch;
 using Solver;
 using Validation;
 
-Console.WriteLine("Generating possible answers...");
+ConsoleHelper.WriteLine("Generating possible answers...", ConsoleColor.DarkYellow);
 var answers = Generation.possibleSolutions
     .Where(NerdleValidator.IsValidEquation)
     .ToList();
@@ -11,25 +12,26 @@ while (true)
 {
     var solver = new NerdleSolver(answers);
     var proposition = solver.SuggestFirstGuess();
-    Console.WriteLine($"Your first guess should be: {proposition.Guess}");
+    ConsoleHelper.Write("Your first guess should be ");
+    ConsoleHelper.WriteLine(proposition.Guess, ConsoleColor.DarkMagenta);
 
     while (true)
     {
-        Console.WriteLine("What's the result?!");
+        ConsoleHelper.Write("Result: ");
+        Console.ForegroundColor = ConsoleColor.DarkGreen;
         var guessResult = Console.ReadLine();
         proposition = solver.SuggestNextGuess(guessResult);
         if (proposition.Count == 1)
         {
-            var fgc = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.DarkMagenta;
-            Console.WriteLine($"The answer is {proposition.Guess}!!!");
-            Console.ForegroundColor = fgc;
+            ConsoleHelper.Write("The answer is ");
+            ConsoleHelper.WriteLine(proposition.Guess, ConsoleColor.DarkMagenta);
             break;
         }
-        Console.WriteLine($"Out of {proposition.Count} possible answers, try {proposition.Guess}");
+        ConsoleHelper.Write($"Out of {proposition.Count} possible answers, try ");
+        ConsoleHelper.WriteLine(proposition.Guess, ConsoleColor.DarkMagenta);
     }
 
-    Console.WriteLine("Press 'p' to play again...");
+    ConsoleHelper.WriteLine("Press 'p' to play again, any other key to quit.", ConsoleColor.DarkYellow);
     var key = Console.ReadKey();
     if (key.KeyChar != 'p')
         break;
