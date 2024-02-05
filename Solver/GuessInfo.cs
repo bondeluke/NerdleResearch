@@ -3,8 +3,8 @@
 internal enum GuessResult
 {
     Correct,
-    Somewhere,
-    Dead
+    Present,
+    Absent
 }
 
 internal class GuessInfo(char character, int index, GuessResult result)

@@ -2,6 +2,8 @@
 
 public class NerdleSolver(IList<string> answers)
 {
+    private const int NerdleWidth = 8;
+
     private readonly List<string> possibilities =
     [
         "0123456789",
@@ -19,80 +21,62 @@ public class NerdleSolver(IList<string> answers)
         .Append(new CharacterInfo('=', 1, OccurenceType.Exactly))
         .ToList();
 
-    private readonly Random random = new (DateTime.Now.Millisecond);
-    private string? theGuess;
+    private readonly Random random = new(DateTime.Now.Millisecond);
+    private string? previousGuess;
 
-    public void SuggestFirstGuess()
+    public SuggestionResult SuggestFirstGuess()
     {
         var goodGuesses = answers
             .Where(a => a.IndexOf('=') == 5 && a.Distinct().Count() == 8)
             .ToList();
 
-        theGuess = goodGuesses[random.Next(goodGuesses.Count)];
+        previousGuess = goodGuesses[random.Next(goodGuesses.Count)];
 
-        Console.WriteLine($"Your first guess should be: {theGuess}");
+        return new SuggestionResult(previousGuess, answers.Count);
     }
 
-    public bool DigestGuess(string result)
+    public SuggestionResult SuggestNextGuess(string previousGuessResult)
     {
-        if (theGuess is null)
+        if (previousGuess is null)
         {
             throw new Exception("Execute method 'SuggestFirstGuess()' first!");
         }
 
-        var guessInfo = result
-            .Select((_, i) => new GuessInfo(theGuess[i], i, Convert(result[i])))
+        var guessInfo = Enumerable.Range(0, NerdleWidth)
+            .Select(i => new GuessInfo(previousGuess[i], i, Convert(previousGuessResult[i])))
             .GroupBy(c => c.Character);
 
-        foreach (var guess in guessInfo)
+        foreach (var characterGuesses in guessInfo)
         {
-            var character = guess.Key.ToString();
-            var info = information.First(c => c.Character == guess.Key);
-            var dead = guess.Where(g => g.Result == GuessResult.Dead).ToList();
-            var correct = guess.Where(g => g.Result == GuessResult.Correct).ToList();
-            var somewhere = guess.Where(g => g.Result == GuessResult.Somewhere).ToList();
+            var correct = characterGuesses.Where(g => g.Result == GuessResult.Correct).ToList();
+            var present = characterGuesses.Where(g => g.Result == GuessResult.Present).ToList();
+            var absent = characterGuesses.Where(g => g.Result == GuessResult.Absent).ToList();
 
-            info.Count = Math.Max(correct.Count + somewhere.Count, info.Count);
+            var info = information.First(c => c.Character == characterGuesses.Key);
+
+            info.Count = Math.Max(correct.Count + present.Count, info.Count);
             info.Type = info.Type == OccurenceType.Exactly
                 ? OccurenceType.Exactly
                 : info.Count != 0
-                    ? dead.Count != 0
+                    ? absent.Count != 0
                         ? OccurenceType.Exactly
                         : OccurenceType.AtLeast
-                    : OccurenceType.Dead;
+                    : OccurenceType.Absent;
 
-            foreach (var g in correct)
+            var character = characterGuesses.Key.ToString();
+
+            foreach (var i in correct.Select(c => c.Index))
             {
-                possibilities[g.Index] = character;
-            }
-            foreach (var g in somewhere.Concat(dead))
-            {
-                possibilities[g.Index] = possibilities[g.Index].Replace(character, "");
+                possibilities[i] = character;
             }
 
-            if (somewhere.Count != 0 || dead.Count == 0) continue;
-
-            // Dead characters, and no somewhere means we can cross out a few more.
-            var extraIndexesToCrossOut = Enumerable
-                .Range(0, possibilities.Count)
-                .Where(i => correct.All(c => c.Index != i));
-
-            foreach (var index in extraIndexesToCrossOut)
+            foreach (var i in FindIndicesToCrossOut(correct, present, absent))
             {
-                possibilities[index] = possibilities[index].Replace(character, "");
+                possibilities[i] = possibilities[i].Replace(character, string.Empty);
             }
         }
 
         UpdateAnswers();
-
-        if (answers.Count == 1)
-        {
-            var fgc = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.DarkMagenta;
-            Console.WriteLine($"The answer is {answers.First()} !!!");
-            Console.ForegroundColor = fgc;
-            return true;
-        }
 
         var unknownCharacters = information
             .Where(c => c.Type == OccurenceType.Unknown)
@@ -104,24 +88,42 @@ public class NerdleSolver(IList<string> answers)
             .First()
             .ToList();
 
-        Console.WriteLine($"There are {answers.Count} possible answers, but only {bestGuesses.Count} best guesses!");
+        //Console.WriteLine($"There are {answers.Count} possible answers, but only {bestGuesses.Count} best guesses!");
 
-        theGuess = bestGuesses[random.Next(bestGuesses.Count)];
+        previousGuess = bestGuesses[random.Next(bestGuesses.Count)];
 
-        Console.WriteLine($"Your next guess should be: {theGuess}");
+        return new SuggestionResult(previousGuess, answers.Count); ;
+    }
 
-        return false;
+    private static IEnumerable<int> FindIndicesToCrossOut(IList<GuessInfo> correct, IList<GuessInfo> present, IList<GuessInfo> absent)
+    {
+        // Some absent characters and no present characters means we can just cross out everything that isn't correct.
+        if (absent.Count != 0 && present.Count == 0)
+            return Enumerable.Range(0, NerdleWidth)
+                .Where(i => correct.All(c => c.Index != i));
+
+        return present.Concat(absent).Select(c => c.Index);
     }
 
     private void UpdateAnswers()
     {
         answers = answers
-            .Where(answer => information
-                .Where(c => c.Type is OccurenceType.AtLeast or OccurenceType.Exactly)
-                .Select(c => c.Character)
-                .All(answer.Contains))
-            .Where(answer => answer
-                .Select((_, index) => index)
+            .Where(answer =>
+            {
+                var counts = answer
+                    .GroupBy(c => c)
+                    .Select(g => (Character: g.Key, Count: g.Count()));
+                var exactly = information
+                    .Where(c => c.Type is OccurenceType.Exactly)
+                    .Select(c => (c.Character, c.Count));
+                var atLeast = information
+                    .Where(c => c.Type is OccurenceType.AtLeast)
+                    .Select(c => (c.Character, c.Count));
+
+                return exactly.All(e => counts.Any(c => c.Character == e.Character && c.Count == e.Count)) &&
+                       atLeast.All(a => counts.Any(c => c.Character == a.Character && c.Count >= a.Count));
+            })
+            .Where(answer => Enumerable.Range(0, NerdleWidth)
                 .All(index => possibilities[index].Contains(answer[index]))
             ).ToList();
     }
@@ -130,9 +132,9 @@ public class NerdleSolver(IList<string> answers)
     {
         return result switch
         {
-            'G' => GuessResult.Correct,
-            'P' => GuessResult.Somewhere,
-            'B' => GuessResult.Dead,
+            'C' => GuessResult.Correct,
+            'P' => GuessResult.Present,
+            'A' => GuessResult.Absent,
             _ => throw new ArgumentOutOfRangeException(nameof(result), result, null)
         };
     }

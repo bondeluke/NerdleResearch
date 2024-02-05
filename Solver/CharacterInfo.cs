@@ -5,7 +5,7 @@ internal enum OccurenceType
     Unknown,
     Exactly,
     AtLeast,
-    Dead
+    Absent
 }
 
 internal class CharacterInfo(char character, int count = -1, OccurenceType type = OccurenceType.Unknown)
@@ -21,7 +21,7 @@ internal class CharacterInfo(char character, int count = -1, OccurenceType type 
             OccurenceType.AtLeast => $"{Character} | at least {Count}",
             OccurenceType.Exactly => $"{Character} | exactly {Count}",
             OccurenceType.Unknown => $"{Character} | ?",
-            OccurenceType.Dead => $"{Character} | DEAD",
+            OccurenceType.Absent => $"{Character} | X",
             _ => throw new ArgumentOutOfRangeException()
         };
     }
