@@ -1,8 +1,19 @@
 using Microsoft.OpenApi.Models;
 using NerdleSolverApi;
 
+NerdleApi.SuggestGuess([]); // Bootstrap Answers
 var builder = WebApplication.CreateBuilder(args);
 
+const string allowNerdlePolicy = "ALLOW_NERDLE_POLICY";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: allowNerdlePolicy, policy =>
+        policy
+        .WithOrigins("https://nerdlegame.com")
+        .AllowAnyHeader()
+        .AllowAnyMethod());
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -11,6 +22,8 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+app.UseCors(allowNerdlePolicy);
+app.UseStaticFiles(); // UseStaticFiles() must be after UseCors(...)
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {

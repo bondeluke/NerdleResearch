@@ -9,7 +9,7 @@ namespace NerdleSolverApi
             .Where(NerdleValidator.IsValidEquation)
             .ToList();
 
-        public static SuggestionDto SuggestGuess(List<NerdleGuessResultDto> results)
+        public static SuggestionDto SuggestGuess(NerdleGuessResultDto[] results)
         {
             return new NerdleSolver(Answers)
                 .SuggestGuess(results.FromDto())
