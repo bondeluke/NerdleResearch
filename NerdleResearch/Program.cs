@@ -10,25 +10,23 @@ var answers = Generation.possibleSolutions
 
 while (true)
 {
-    var solver = new NerdleSolver(answers);
+    var solver = new SolverWrapper(new NerdleSolver(answers));
     var proposition = solver.SuggestFirstGuess();
-    ConsoleHelper.Write("Your first guess should be ");
-    ConsoleHelper.WriteLine(proposition.Guess, ConsoleColor.DarkMagenta);
 
     while (true)
     {
+        ConsoleHelper.Write($"Out of {proposition.Count} possible answers, try ");
+        ConsoleHelper.WriteLine(proposition.Guess, ConsoleColor.DarkMagenta);
         ConsoleHelper.Write("Result: ");
         Console.ForegroundColor = ConsoleColor.DarkGreen;
         var guessResult = Console.ReadLine();
-        proposition = solver.SuggestNextGuess(guessResult);
+        proposition = solver.SuggestGuess(proposition.Guess, guessResult);
         if (proposition.Count == 1)
         {
             ConsoleHelper.Write("The answer is ");
             ConsoleHelper.WriteLine(proposition.Guess, ConsoleColor.DarkMagenta);
             break;
         }
-        ConsoleHelper.Write($"Out of {proposition.Count} possible answers, try ");
-        ConsoleHelper.WriteLine(proposition.Guess, ConsoleColor.DarkMagenta);
     }
 
     ConsoleHelper.WriteLine("Press 'p' to play again, any other key to quit.", ConsoleColor.DarkYellow);
