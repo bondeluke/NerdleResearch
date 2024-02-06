@@ -1,3 +1,5 @@
+What started as a simple exercise to count the number of valid Nerdle solutions (it's 17,719 by the way) turned into a visual Nerdle puzzle solver!
+
 Just run the C# web server, then execute this code in the terminal of a Nerdle puzzle page!
 ```javascript
 var script = document.createElement('script');
