@@ -1,4 +1,5 @@
 using Microsoft.OpenApi.Models;
+using NerdleSolverApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,6 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Nerdle Solver API V1");
 });
 
-app.MapGet("/", () => "Hello World!");
+app.MapPost("/suggest-guess", NerdleApi.SuggestGuess);
 
 app.Run();

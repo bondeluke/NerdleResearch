@@ -8,7 +8,7 @@ internal enum OccurenceType
     Absent
 }
 
-internal class CharacterInfo(char character, int count = -1, OccurenceType type = OccurenceType.Unknown)
+internal class CharacterOccurence(char character, int count = -1, OccurenceType type = OccurenceType.Unknown)
 {
     public char Character = character;
     public int Count = count;

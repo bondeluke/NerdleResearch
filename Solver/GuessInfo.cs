@@ -7,12 +7,8 @@ public enum GuessResult
     Absent
 }
 
-public class GuessInfo(int index, char character, GuessResult result)
+public record GuessInfo(int Index, char Character, GuessResult Result)
 {
-    public int Index { get; } = index;
-    public char Character { get; } = character;
-    public GuessResult Result { get; } = result;
-
     public override string ToString()
     {
         return $"{Index} | {Character} | {Result}";

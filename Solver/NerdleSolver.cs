@@ -16,9 +16,9 @@ public class NerdleSolver(IList<string> answers)
             return new Suggestion(goodFirstGuesses[random.Next(goodFirstGuesses.Count)], answers.Count);
         }
 
-        var information = "0123456789+-*/"
-            .Select(c => new CharacterInfo(c))
-            .Append(new CharacterInfo('=', 1, OccurenceType.Exactly))
+        var occurrences = "0123456789+-*/"
+            .Select(c => new CharacterOccurence(c))
+            .Append(new CharacterOccurence('=', 1, OccurenceType.Exactly))
             .ToList();
 
         List<string> possibilities =
@@ -41,12 +41,12 @@ public class NerdleSolver(IList<string> answers)
                 var present = characterGuesses.Where(g => g.Result == GuessResult.Present).ToList();
                 var absent = characterGuesses.Where(g => g.Result == GuessResult.Absent).ToList();
 
-                var info = information.First(c => c.Character == characterGuesses.Key);
+                var occurrence = occurrences.First(c => c.Character == characterGuesses.Key);
 
-                info.Count = Math.Max(correct.Count + present.Count, info.Count);
-                info.Type = info.Type == OccurenceType.Exactly
+                occurrence.Count = Math.Max(correct.Count + present.Count, occurrence.Count);
+                occurrence.Type = occurrence.Type == OccurenceType.Exactly
                     ? OccurenceType.Exactly
-                    : info.Count != 0
+                    : occurrence.Count != 0
                         ? absent.Count != 0
                             ? OccurenceType.Exactly
                             : OccurenceType.AtLeast
@@ -66,9 +66,9 @@ public class NerdleSolver(IList<string> answers)
             }
         }
 
-        answers = UpdateAnswers(information, possibilities);
+        answers = UpdateAnswers(occurrences, possibilities);
 
-        var unknownCharacters = information
+        var unknownCharacters = occurrences
             .Where(c => c.Type == OccurenceType.Unknown)
             .Select(c => c.Character);
 
@@ -93,7 +93,7 @@ public class NerdleSolver(IList<string> answers)
         return present.Concat(absent).Select(c => c.Index);
     }
 
-    private List<string> UpdateAnswers(IReadOnlyList<CharacterInfo> information, IReadOnlyList<string> possibilities)
+    private List<string> UpdateAnswers(IReadOnlyList<CharacterOccurence> occurrences, IReadOnlyList<string> possibilities)
     {
         return answers
             .Where(answer =>
@@ -101,10 +101,10 @@ public class NerdleSolver(IList<string> answers)
                 var counts = answer
                     .GroupBy(c => c)
                     .Select(g => (Character: g.Key, Count: g.Count()));
-                var exactly = information
+                var exactly = occurrences
                     .Where(c => c.Type is OccurenceType.Exactly)
                     .Select(c => (c.Character, c.Count));
-                var atLeast = information
+                var atLeast = occurrences
                     .Where(c => c.Type is OccurenceType.AtLeast)
                     .Select(c => (c.Character, c.Count));
 
