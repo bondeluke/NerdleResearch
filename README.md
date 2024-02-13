@@ -9,5 +9,5 @@ script.type = 'module';
 script.src = 'http://localhost:5209/SolveNerdle.js';
 document.head.appendChild(script);
 ```
-
+Check out this video of my solver in action!
 https://github.com/bondeluke/NerdleSolver/assets/7105195/95b86a1a-f7e7-4cdc-a6e8-ae84ddc40238
